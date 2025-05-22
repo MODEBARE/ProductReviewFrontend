@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import type { Review } from '../types/review';
+import type { Review } from '../types/Review'; // ⬅️ Uppercase import
 
 interface Props {
   productId: number;
@@ -14,14 +14,16 @@ const ReviewForm = ({ productId, onReviewAdded, existingReview }: Props) => {
   const [comment, setComment] = useState(existingReview?.comment || '');
   const [isEditing] = useState(!!existingReview);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const review: Omit<Review, 'id' | 'date'> = { productId, author, rating, comment };
     try {
       if (isEditing && existingReview) {
-        await axios.put(`http://localhost:5050/products/${productId}/reviews/${existingReview.id}`, review);
+        await axios.put(`${API_BASE}/api/products/${productId}/reviews/${existingReview.id}`, review);
       } else {
-        await axios.post(`http://localhost:5050/products/${productId}/reviews`, review);
+        await axios.post(`${API_BASE}/api/products/${productId}/reviews`, review);
       }
       onReviewAdded();
       setAuthor('');
@@ -35,7 +37,7 @@ const ReviewForm = ({ productId, onReviewAdded, existingReview }: Props) => {
   const handleDelete = async () => {
     if (existingReview) {
       try {
-        await axios.delete(`http://localhost:5050/products/${productId}/reviews/${existingReview.id}`);
+        await axios.delete(`${API_BASE}/api/products/${productId}/reviews/${existingReview.id}`);
         onReviewAdded();
       } catch (error) {
         console.error('Error deleting review:', error);

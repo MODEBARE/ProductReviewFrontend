@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -21,20 +20,22 @@ const ProductDetail = () => {
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   const fetchProduct = async () => {
-    const res = await axios.get('/api/products');
+    const res = await axios.get(`${BASE_URL}/api/products`);
     const found = res.data.find((p: any) => p.id === Number(id));
     setProduct(found);
   };
 
   const fetchReviews = async () => {
-    const res = await axios.get(`/api/products/${id}/reviews`);
+    const res = await axios.get(`${BASE_URL}/api/products/${id}/reviews`);
     setReviews(res.data);
   };
 
   const fetchSummary = async () => {
     try {
-      const res = await axios.get(`/api/products/${id}/reviews/summary`);
+      const res = await axios.get(`${BASE_URL}/api/products/${id}/reviews/summary`);
       setSummary(res.data.summary);
     } catch {
       setSummary('');
@@ -53,10 +54,10 @@ const ProductDetail = () => {
     e.preventDefault();
     try {
       if (editId) {
-        await axios.put(`/api/products/${id}/reviews/${editId}`, { rating, comment });
+        await axios.put(`${BASE_URL}/api/products/${id}/reviews/${editId}`, { rating, comment });
         setEditId(null);
       } else {
-        await axios.post(`/api/products/${id}/reviews`, { author, rating, comment });
+        await axios.post(`${BASE_URL}/api/products/${id}/reviews`, { author, rating, comment });
         setAuthor('');
       }
       setRating(5);
@@ -70,7 +71,7 @@ const ProductDetail = () => {
 
   const handleDelete = async (reviewId: number) => {
     try {
-      await axios.delete(`/api/products/${id}/reviews/${reviewId}`);
+      await axios.delete(`${BASE_URL}/api/products/${id}/reviews/${reviewId}`);
       fetchReviews();
       fetchSummary();
     } catch (err) {
@@ -93,7 +94,9 @@ const ProductDetail = () => {
         <p className="text-sm text-gray-600 mb-2">{product?.description}</p>
         <p className="text-sm text-blue-600 mb-2">Category: {product?.category}</p>
         <p className="text-green-600 mb-2 font-bold">Price: ${product?.price}</p>
-        <p className="text-yellow-600 font-bold mb-4">Average Rating: {product?.averageRating?.toFixed(1) ?? 'No rating yet'}</p>
+        <p className="text-yellow-600 font-bold mb-4">
+          Average Rating: {typeof product?.averageRating === 'number' ? product.averageRating.toFixed(1) : 'No rating yet'}
+        </p>
 
         {summary && (
           <div className="bg-blue-50 p-4 rounded mb-4">

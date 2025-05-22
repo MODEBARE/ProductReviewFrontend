@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -20,9 +19,11 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('/api/products');
+      const res = await axios.get(`${API_BASE}/api/products`);
       setProducts(res.data);
       setAllProducts(res.data);
     } catch (err) {
@@ -46,7 +47,10 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen bg-cover bg-center p-4" style={{ backgroundImage: 'url(https://source.unsplash.com/featured/?technology)' }}>
+    <div
+      className="min-h-screen bg-cover bg-center p-4"
+      style={{ backgroundImage: 'url(https://source.unsplash.com/featured/?technology)' }}
+    >
       <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-md max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-4 text-center">Explore Our Products</h1>
 
@@ -72,12 +76,18 @@ const Home = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayedProducts.map(product => (
-            <Link to={`/product/${product.id}`} key={product.id} className="bg-gray-100 hover:bg-gray-200 p-4 rounded shadow">
+            <Link
+              to={`/product/${product.id}`}
+              key={product.id}
+              className="bg-gray-100 hover:bg-gray-200 p-4 rounded shadow transform hover:scale-105 transition-all duration-200"
+            >
               <h2 className="text-xl font-semibold">{product.name}</h2>
               <p className="text-sm text-gray-600">{product.description}</p>
               <p className="text-sm text-blue-700 font-semibold">Category: {product.category}</p>
               <p className="text-sm text-green-700 font-bold">${product.price}</p>
-              <p className="text-yellow-600">⭐ {product.averageRating?.toFixed(1) ?? 'No rating'}</p>
+              <p className="text-yellow-600">
+                ⭐ {product.averageRating !== null ? product.averageRating.toFixed(1) : 'No rating'}
+              </p>
             </Link>
           ))}
         </div>
